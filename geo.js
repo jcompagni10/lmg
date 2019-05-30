@@ -1,6 +1,6 @@
 const LMG_LAT = 37.752462;
 const LMG_LONG = -122.415675;
-const MAX_DIST = .5;
+const MAX_DIST = 5;
 
 function distance_between_coords(lat1, lon1, lat2, lon2) {
 	  if ((lat1 == lat2) && (lon1 == lon2)) {
@@ -27,15 +27,36 @@ function validateGPS (location){
     let long = location.coords.longitude;
     let distance = distance_between_coords(lat, long, LMG_LAT, LMG_LONG);
     if (distance < MAX_DIST){
-        $("#slider_widget_wrapper").show();
+        // TODO: Put url for next page here
+        document.location.href ="https://www.lastmingear.com/nextpage";
     } else {
-        $("#not_in_range_content").show();
+        // TODO: Change copy here
+        let outOfRangeText = "<p> Show instruction for out of range here. </p>";
+        $("#error-content").html(outOfRangeText);
     }
 }
 
+function handleError (error){
+    console.log(error);
+    let errorText;
+    switch(error.code) {
+    case error.PERMISSION_DENIED:
+        errorText = "<p>It looks like location sharing was denied. Please click the button above again, and make sure to click 'Yes' or 'Allow' so that we can receive your location.</p>";
+        break;
+
+    case error.POSITION_UNAVAILABLE:
+        errorText = "<p> We can't determine your location. Ensure you're connected to the Internet, then please try again. If that doesn't work, try sharing location at a browser level, see <a href='https://www.wikihow.com/Enable-Location-Services-on-Google-Chrome' target='_blank'>this</a> guide for Google Chrome or <a href='https://support.apple.com/en-us/HT207092' target='_blank'>this</a> guide for Google Chrome or <a href='https://support.apple.com/en-us/HT207092' >this</a> guide for Safari (can you try to find a guide for Safari?) </p>";
+        break;
+
+    default:
+        errorText = "<p>We apologize, there is an unknown error with location sharing. Please call us at <%= ENV['pretty_phone'] %>. A support agent will need to transfer you to a manager for remote unlocking. </p>";
+        break;
+    }
+    $("#error-content").html(errorText);
+
+}
 function enableGPS(){
-    let errorFn = function(){window.alert("NO GPS")};
-    navigator.geolocation.getCurrentPosition(validateGPS, errorFn);
+    navigator.geolocation.getCurrentPosition(validateGPS, handleError);
 }
 
 function init(){
