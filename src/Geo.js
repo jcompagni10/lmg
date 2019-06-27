@@ -28,7 +28,6 @@ function setWindowLocation(loc){
 }
 
 function validateGPS (location){
-    console.log(location);
     let lat = location.coords.latitude;
     let long = location.coords.longitude;
     let distance = distanceBetweenCoords(lat, long, LMG_LAT, LMG_LONG);
@@ -36,6 +35,8 @@ function validateGPS (location){
         // TODO: Put url for next page here
         setWindowLocation("https://www.lastmingear.com/nextpage");
     } else {
+        $("#enable-gps-btn").show();
+        $("#checking-location-msg").hide();
         // TODO: Change copy here
         let outOfRangeText = "<p>Show instruction for out of range here.</p>";
         $("#error-content").html(outOfRangeText);
@@ -44,6 +45,8 @@ function validateGPS (location){
 
 function handleError (error){
     console.log(error);
+    $("#enable-gps-btn").show();
+    $("#checking-location-msg").hide();
     let errorText;
     switch(error.code) {
     case error.PERMISSION_DENIED:
@@ -62,6 +65,9 @@ function handleError (error){
 
 }
 function enableGPS(){
+    $("#enable-gps-btn").hide();
+    $("#checking-location-msg").show();
+
     navigator.geolocation.getCurrentPosition(validateGPS, handleError);
 }
 
