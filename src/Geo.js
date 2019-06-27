@@ -1,8 +1,8 @@
 const LMG_LAT = 37.752462;
 const LMG_LONG = -122.415675;
-const MAX_DIST = 5;
+const MAX_DIST = .5;
 
-function distance_between_coords(lat1, lon1, lat2, lon2) {
+function distanceBetweenCoords(lat1, lon1, lat2, lon2) {
 	  if ((lat1 == lat2) && (lon1 == lon2)) {
 		    return 0;
 	  }
@@ -22,16 +22,22 @@ function distance_between_coords(lat1, lon1, lat2, lon2) {
 	  }
 }
 
+//This is kinda unneccesary, but its makes testing easier;
+function setWindowLocation(loc){
+    document.location.href = loc;
+}
+
 function validateGPS (location){
+    console.log(location);
     let lat = location.coords.latitude;
     let long = location.coords.longitude;
-    let distance = distance_between_coords(lat, long, LMG_LAT, LMG_LONG);
+    let distance = distanceBetweenCoords(lat, long, LMG_LAT, LMG_LONG);
     if (distance < MAX_DIST){
         // TODO: Put url for next page here
-        document.location.href ="https://www.lastmingear.com/nextpage";
+        setWindowLocation("https://www.lastmingear.com/nextpage");
     } else {
         // TODO: Change copy here
-        let outOfRangeText = "<p> Show instruction for out of range here. </p>";
+        let outOfRangeText = "<p>Show instruction for out of range here.</p>";
         $("#error-content").html(outOfRangeText);
     }
 }
@@ -45,11 +51,11 @@ function handleError (error){
         break;
 
     case error.POSITION_UNAVAILABLE:
-        errorText = "<p> We can't determine your location. Ensure you're connected to the Internet, then please try again. If that doesn't work, try sharing location at a browser level, see <a href='https://www.wikihow.com/Enable-Location-Services-on-Google-Chrome' target='_blank'>this</a> guide for Google Chrome or <a href='https://support.apple.com/en-us/HT207092' target='_blank'>this</a> guide for Google Chrome or <a href='https://support.apple.com/en-us/HT207092' >this</a> guide for Safari (can you try to find a guide for Safari?) </p>";
+        errorText = "<p>We can't determine your location. Ensure you're connected to the Internet, then please try again. If that doesn't work, try sharing location at a browser level, see <a href='https://www.wikihow.com/Enable-Location-Services-on-Google-Chrome' target='_blank'>this</a> guide for Google Chrome or <a href='https://support.apple.com/en-us/HT207092' target='_blank'>this</a> guide for Google Chrome or <a href='https://support.apple.com/en-us/HT207092' >this</a> guide for Safari (can you try to find a guide for Safari?)</p>";
         break;
 
     default:
-        errorText = "<p>We apologize, there is an unknown error with location sharing. Please call us at <%= ENV['pretty_phone'] %>. A support agent will need to transfer you to a manager for remote unlocking. </p>";
+        errorText = "<p>We apologize, there is an unknown error with location sharing. Please call us at <%= ENV['pretty_phone'] %>. A support agent will need to transfer you to a manager for remote unlocking.</p>";
         break;
     }
     $("#error-content").html(errorText);
