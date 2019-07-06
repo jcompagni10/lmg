@@ -1,5 +1,6 @@
 const LMG_LAT = 37.752462;
 const LMG_LONG = -122.415675;
+// maximum allowable distance from LMG lat/long in mi.
 const MAX_DIST = .5;
 
 function distanceBetweenCoords(lat1, lon1, lat2, lon2) {
@@ -27,6 +28,12 @@ function setWindowLocation(loc){
     document.location.href = loc;
 }
 
+function errorUIHelper (errorMessage){
+    $("#enable-gps-btn").show();
+    $("#checking-location-msg").hide();
+    $("#error-content").html(errorMessage);
+}
+
 function validateGPS (location){
     let lat = location.coords.latitude;
     let long = location.coords.longitude;
@@ -35,18 +42,13 @@ function validateGPS (location){
         // TODO: Put url for next page here
         setWindowLocation("https://www.lastmingear.com/nextpage");
     } else {
-        $("#enable-gps-btn").show();
-        $("#checking-location-msg").hide();
         // TODO: Change copy here
         let outOfRangeText = "<p>Show instruction for out of range here.</p>";
-        $("#error-content").html(outOfRangeText);
+        errorUIHelper(outOfRangeText);
     }
 }
 
-function handleError (error){
-    console.log(error);
-    $("#enable-gps-btn").show();
-    $("#checking-location-msg").hide();
+function handleGeolocationError (error){
     let errorText;
     switch(error.code) {
     case error.PERMISSION_DENIED:
@@ -61,18 +63,14 @@ function handleError (error){
         errorText = "<p>We apologize, there is an unknown error with location sharing. Please call us at <%= ENV['pretty_phone'] %>. A support agent will need to transfer you to a manager for remote unlocking.</p>";
         break;
     }
-    $("#error-content").html(errorText);
-
+    errorUIHelper(errorText);
 }
+
 function enableGPS(){
     $("#enable-gps-btn").hide();
     $("#checking-location-msg").show();
 
-    navigator.geolocation.getCurrentPosition(validateGPS, handleError);
+    navigator.geolocation.getCurrentPosition(validateGPS, handleGeolocationError);
 }
 
-function init(){
-    $("#enable-gps-btn").click(enableGPS);
-}
-
-$(document).ready(init);
+$(document).ready(()=>$("#enable-gps-btn").click(enableGPS));
